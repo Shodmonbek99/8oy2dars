@@ -1,25 +1,73 @@
-var userForm = document.getElementById('userForm');
-var userCards = document.getElementById('userCards');
-var users = [];
-userForm.addEventListener('submit', function (event) {
+"use strict";
+const userForm = document.getElementById('userForm');
+const userCards = document.getElementById('userCards');
+let users = [];
+userForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    var nameInput = document.getElementById('name');
-    var emailInput = document.getElementById('email');
-    var newUser = {
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const newUser = {
         name: nameInput.value,
-        email: emailInput.value
+        email: emailInput.value,
+        password: passwordInput.value
     };
     users.push(newUser);
     nameInput.value = '';
     emailInput.value = '';
+    passwordInput.value = '';
     renderUserCards();
 });
 function renderUserCards() {
     userCards.innerHTML = '';
-    users.forEach(function (user) {
-        var card = document.createElement('div');
+    users.forEach((user, index) => {
+        const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = "\n            <h2>".concat(user.name, "</h2>\n            <p>").concat(user.email, "</p>\n        ");
+        card.innerHTML = `
+            <h2>${user.name}</h2>
+            <p>${user.email}</p>
+            <p>${user.password}</p>
+            <button class="edit" onclick="editUser(${index})">Edit</button>
+            <button onclick="deleteUser(${index})">Delete</button>
+        `;
         userCards.appendChild(card);
     });
 }
+function deleteUser(index) {
+    users.splice(index, 1);
+    renderUserCards();
+}
+function editUser(index) {
+    const user = users[index];
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    nameInput.value = user.name;
+    emailInput.value = user.email;
+    passwordInput.value = user.password;
+    userForm.onsubmit = (event) => {
+        event.preventDefault();
+        user.name = nameInput.value;
+        user.email = emailInput.value;
+        user.password = passwordInput.value;
+        renderUserCards();
+        userForm.onsubmit = addUser;
+    };
+}
+function addUser(event) {
+    event.preventDefault();
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const newUser = {
+        name: nameInput.value,
+        email: emailInput.value,
+        password: passwordInput.value
+    };
+    users.push(newUser);
+    nameInput.value = '';
+    emailInput.value = '';
+    passwordInput.value = '';
+    renderUserCards();
+}
+userForm.addEventListener('submit', addUser);
